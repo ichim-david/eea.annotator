@@ -13,4 +13,6 @@
     i18n:attributes="title">
     <span i18n:translate="">Inline comments</span>
   </a>
+  <input tal:condition="python:not view.readOnly"
+    tal:replace="structure context/@@authenticator/authenticator" />
 </div>

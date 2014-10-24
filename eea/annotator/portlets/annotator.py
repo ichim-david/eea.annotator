@@ -48,6 +48,12 @@ class AddForm(base.AddForm):
     description = _(
         u"This portlet traces all inline comments for this document")
 
+    @property
+    def schema(self):
+        """ z3c.form schema
+        """
+        return IAnnotatorPortlet
+
     def create(self, data):
         """ Create
         """

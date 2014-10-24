@@ -1,11 +1,13 @@
 Changelog
 =========
 
-2.7-dev - (unreleased)
+3.0-dev - (unreleased)
 ----------------------
 * Change: prefixed css for hover state of accordion header to the
   eea-accordion-title class
   [ichim-david refs #19875]
+* Feature: Plone 5 compatible
+  [avoinea]
 
 2.6 - (2014-09-15)
 ------------------

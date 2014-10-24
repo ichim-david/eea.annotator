@@ -192,11 +192,14 @@ EEA.Annotator = function(context, options){
   self.context = context;
   self.target = jQuery('#content');
 
+  var authenticator = self.context.find('input[name="_authenticator"]');
+  authenticator = authenticator ? authenticator.val() : "";
   self.settings = {
     readOnly: self.context.data('readonly') || 0,
     autoSync: self.context.data('autosync') || 0,
     noDuplicates: self.context.data('noduplicates') || false,
     minWords: self.context.data('minwords') || 0,
+    authenticator: authenticator,
     history: true,
     worker: '',
     prefix: '',
@@ -262,7 +265,8 @@ EEA.Annotator.prototype = {
       readOnly: Boolean(self.settings.readOnly),
       exactMatch: true,
       noDuplicates: Boolean(self.settings.noDuplicates),
-      minWords: parseInt(self.settings.minWords, 10)
+      minWords: parseInt(self.settings.minWords, 10),
+      authenticator: self.settings.authenticator
     });
 
     // Add comment date
@@ -375,6 +379,13 @@ EEA.AnnotatorPortlet.prototype = {
     self.header = self.context.find('.portletHeader');
     self.parent = self.context.parent();
     self.width = self.context.width();
+    self.subscribe = self.context.find('.annotator-subscription-button');
+    self.authenticator = self.header.find('input[name="_authenticator"]').val();
+
+    self.subscribe.click(function(evt) {
+      evt.preventDefault();
+      self.onSubscribe(evt);
+    });
 
     // Handle Events
     var errata = self.context.find('.annotator-errata');
@@ -569,6 +580,52 @@ EEA.AnnotatorPortlet.prototype = {
       }
       jQuery(highlight).addClass('hover');
     });
+  },
+
+  onSubscribe: function(evt){
+    var self = this;
+
+    var action = self.subscribe.attr('href');
+    jQuery.ajax({
+      type: 'post',
+      url: action,
+      data: {ajax: true},
+      beforeSend: function(xhr, settings) {
+        xhr.setRequestHeader('X-CSRF-Token', self.authenticator);
+      },
+      success: function(data){
+        self.afterSubscribe(data);
+      }
+    });
+  },
+
+  afterSubscribe: function(msg) {
+    var self = this;
+
+    if(self.subscribe.hasClass('annotator-subscribe')){
+      self.subscribe
+        .removeClass('annotator-subscribe')
+        .addClass('annotator-unsubscribe')
+        .attr({
+          title: self.header.data('unsubscribetitle'),
+          href: self.header.data('unsubscribehref')
+        });
+      self.subscribe.find('.eea-icon').attr({
+        "class": self.header.data('unsubscribeicon')
+      });
+    }else{
+      self.subscribe
+        .removeClass('annotator-unsubscribe')
+        .addClass('annotator-subscribe')
+        .attr({
+          title: self.header.data('subscribetitle'),
+          href: self.header.data('subscribehref')
+        });
+      self.subscribe.find('.eea-icon').attr({
+        "class": self.header.data('subscribeicon')
+      });
+    }
+    Annotator.showNotification(msg, Annotator.Notification.SUCCESS);
   }
 };
 

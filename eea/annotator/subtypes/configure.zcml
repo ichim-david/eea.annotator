@@ -9,7 +9,7 @@
   </class>
 
   <class class="plone.dexterity.content.DexterityContent"
-    zcml:condition="installed plone.app.dexterity">
+    zcml:condition="installed plone.dexterity">
     <implements interface="eea.annotator.interfaces.IDexterityAnnotatorAware" />
   </class>
 
